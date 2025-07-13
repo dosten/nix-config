@@ -1,0 +1,24 @@
+theme = Catppuccin Mocha
+font-family = FiraCode Nerd Font Mono
+notify-on-command-finish = always
+notify-on-command-finish-action = bell,notify
+
+# Start the window in a maximized state.
+maximize = true
+
+window-padding-x = 5
+window-padding-y = 5
+window-padding-balance = true
+
+# New windows will inherit the working directory of the previously focused window.
+window-inherit-working-directory = true
+tab-inherit-working-directory = true
+split-inherit-working-directory = true
+
+quit-after-last-window-closed = true
+
+#shell-integration = fish
+
+shell-integration-features = true
+
+auto-update = download
