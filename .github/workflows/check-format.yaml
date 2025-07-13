@@ -1,0 +1,21 @@
+name: "nix: check format"
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  check-format:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Check code format
+        run: nix fmt -- --fail-on-change
