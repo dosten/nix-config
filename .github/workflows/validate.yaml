@@ -1,0 +1,87 @@
+name: "nix: validate"
+
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-hosts:
+    name: Build host configurations
+    runs-on: macos-latest
+    permissions:
+      id-token: write
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        host:
+          - dsaintes-ltmjnhx
+          - MacBook-Pro-de-Diego
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Build ${{ matrix.host }} configuration
+        run: nix build ".#darwinConfigurations.${{ matrix.host }}.system" --show-trace
+
+  lint:
+    name: Lint Nix files
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Run statix check
+        run: |
+          nix run nixpkgs#statix -- check .
+      - name: Run deadnix check
+        run: |
+          nix run nixpkgs#deadnix -- --fail .
+
+  check-orphaned-modules:
+    name: Check for orphaned modules
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Check for orphaned modules
+        run: |
+          nix run nixpkgs#bash -- scripts/check-orphaned-modules.sh
+
+  validate-modules:
+    name: Validate module structure
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Validate modules
+        run: |
+          nix run nixpkgs#bash -- scripts/validate-modules.sh
+
+  validate-config:
+    name: Validate configuration
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+      - name: Install Determinate Nix
+        uses: DeterminateSystems/determinate-nix-action@v3
+      - name: Validate configuration
+        run: |
+          nix run nixpkgs#bash -- scripts/validate-config.sh
